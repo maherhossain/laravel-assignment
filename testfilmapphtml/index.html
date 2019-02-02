@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Films App</title>
+	<link rel="stylesheet" href="https://bootswatch.com/4/materia/bootstrap.min.css">
+</head>
+<body>
+	
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Test Film App</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">Home</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+
+
+<div class="container">
+	<div class="row">
+
+		<div class="col-md-8 offset-md-2">
+			
+			<form class="card card-body my-5" id="filmsForm">
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">Title</label>
+			    <input type="text" id="title" class="form-control" placeholder="Enter Title">
+			  </div>
+			  <div class="form-group">
+			    <label for="exampleInputPassword1">Description</label>
+			    <textarea rows="8" class="form-control" id="description" placeholder="Description"></textarea>
+			  </div>
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">Realease Date</label>
+			    <input type="text" id="realeaseDate" class="form-control" placeholder="DD_MM_YY">
+			  </div>
+
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">Rating</label>
+			    <input type="text" id="rating" class="form-control" placeholder="1-5">
+			  </div>
+
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">Ticket Price</label>
+			    <input type="text" id="ticketPrice" class="form-control" placeholder="Ticket Price">
+			  </div>
+
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">country</label>
+			    <input type="text" id="country" class="form-control" placeholder="country">
+			  </div>
+
+			  <div class="form-group">
+			    <label for="exampleInputEmail1">genre</label>
+			    <input type="text" id="genre" class="form-control" placeholder="genre">
+			  </div>
+
+
+			  <input type="submit" value="Save" class="btn btn-primary">
+			</form>
+
+		</div>
+		
+		<hr>
+
+		<div class="col-md-8 offset-md-2">
+			<div id="items">
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function(){
+
+//submit films
+$("#filmsForm").on('submit', function(e){
+	e.preventDefault();
+	let title          = $("#title").val();
+	let description    = $("#description").val();
+	let realeaseDate   = $("#realeaseDate").val();
+	let rating         = $("#rating").val();
+	let ticketPrice    = $("#ticketPrice").val();
+	let country        = $("#country").val();
+	let genre          = $("#genre").val();
+
+	addFilm(title, description, realeaseDate, rating, ticketPrice, country, genre);
+});
+
+function addFilm(title, description, realeaseDate, rating, ticketPrice, country, genre){
+	$.ajax({
+		method:'POST',
+		url: 'http://testfilmapp.me/api/films',
+		data:{title: title, description: description, realeaseDate: realeaseDate, rating: rating, ticketPrice: ticketPrice, country: country, genre: genre}
+	}).done(function(item){
+		alert('Item No '+ item.id +' added');
+		location.reload();
+	});
+}
+
+
+//Delete Films
+$('body').on('click', '.detete-link',function(e){
+	e.preventDefault();
+
+	let id = $(this).data('id');
+	deleteFilm(id);
+});
+function deleteFilm(id){
+	$.ajax({
+		method:'POST',
+		url: 'http://testfilmapp.me/api/films/'+id,
+		data:{_method: 'DELETE'}
+	}).done(function(item){
+		alert('Item Removed');
+		location.reload();
+	});
+}
+
+
+
+// Show all the film lists
+getFilm();
+function getFilm(){
+	$.ajax({
+		url:'http://testfilmapp.me/api/films'
+	}).done(function(items){
+		
+		let output ='';
+		$.each(items, function(key, item){
+			output+=`
+				<div class='card card-body my-3'>
+					<h1>${item.title}</h1>
+					<p>${item.description}</p>
+					<p><b class="pr-3">Realease Date : </b>${item.realeaseDate}</p>
+					<p><b class="pr-3">Rating : </b>${item.rating}</p>
+					<p><b class="pr-3">Ticket Price : </b>${item.ticketPrice}</p>
+					<p><b class="pr-3">Country : </b>${item.country}</p>
+					<p><b class="pr-3">Genre : </b>${item.genre}</p>
+					<p><a href="#" class="text-danger detete-link" data-id="${item.id}">Delete</a>
+					</p>
+				</div>
+			`;
+		});
+		$("#items").append(output);
+	});
+}
+
+});
+
+  </script>
+	
+</body>
+</html>
